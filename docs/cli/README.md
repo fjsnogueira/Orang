@@ -13,6 +13,7 @@ Search, replace, rename and delete files and its content using the power or \.NE
 * [rename](rename-command.md)
 * [replace](replace-command.md)
 * [split](split-command.md)
+* [unescape](unescape-command.md)
 
 
 *\(Generated with [DotMarkdown](http://github.com/JosefPihrt/DotMarkdown)\)*

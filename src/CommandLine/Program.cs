@@ -44,8 +44,9 @@ namespace Orang.CommandLine
                     MatchCommandLineOptions,
                     RenameCommandLineOptions,
                     ReplaceCommandLineOptions,
-                    SplitCommandLineOptions
-                    >(args);
+                    SplitCommandLineOptions,
+                    UnescapeCommandLineOptions
+                    > (args);
 
                 bool success = true;
 
@@ -95,6 +96,7 @@ namespace Orang.CommandLine
                     (RenameCommandLineOptions options) => Rename(options),
                     (ReplaceCommandLineOptions options) => Replace(options),
                     (SplitCommandLineOptions options) => Split(options),
+                    (UnescapeCommandLineOptions options) => Unescape(options),
                     _ => 1);
             }
             catch (Exception ex)
@@ -245,6 +247,20 @@ namespace Orang.CommandLine
                 return 1;
 
             var command = new SplitCommand(options);
+
+            CommandResult result = command.Execute();
+
+            return GetExitCode(result.Kind);
+        }
+
+        private static int Unescape(UnescapeCommandLineOptions commandLineOptions)
+        {
+            var options = new UnescapeCommandOptions();
+
+            if (!commandLineOptions.TryParse(ref options))
+                return 1;
+
+            var command = new UnescapeCommand(options);
 
             CommandResult result = command.Execute();
 
