@@ -11,6 +11,10 @@ namespace Orang
         public static ConsoleColors EmptySplit { get; } = new ConsoleColors(ConsoleColor.Green);
         public static ConsoleColors LineNumber { get; } = new ConsoleColors(ConsoleColor.Cyan);
         public static ConsoleColors Match { get; } = new ConsoleColors(ConsoleColor.Black, ConsoleColor.Green);
+        public static ConsoleColors Match_Group1 { get; } = new ConsoleColors(ConsoleColor.Yellow);
+        public static ConsoleColors Match_Group2 { get; } = new ConsoleColors(ConsoleColor.Cyan);
+        public static ConsoleColors Match_Group3 { get; } = new ConsoleColors(ConsoleColor.Magenta);
+        public static ConsoleColors Match_Group4 { get; } = new ConsoleColors(ConsoleColor.Blue);
         public static ConsoleColors Match_Path { get; } = new ConsoleColors(ConsoleColor.Green);
         public static ConsoleColors MatchBoundary { get; } = new ConsoleColors(ConsoleColor.Green);
         public static ConsoleColors Matched_Path { get; } = new ConsoleColors(ConsoleColor.Cyan);

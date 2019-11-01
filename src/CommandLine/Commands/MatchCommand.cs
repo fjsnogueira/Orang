@@ -48,7 +48,7 @@ namespace Orang.CommandLine
             if (count > 0)
                 WriteLine();
 
-            WriteGroups(matchData.GroupDefinitions);
+            WriteGroups(matchData.GroupDefinitions, outputWriter?.GroupWriter?.IndexesToColors);
             WriteLine(Verbosity.Minimal);
 
             WriteCount("Matches", matchData.Count, Colors.Message_OK, Verbosity.Minimal);

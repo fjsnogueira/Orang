@@ -21,6 +21,8 @@ namespace Orang.CommandLine
 
         public StringWriter Writer { get; }
 
+        internal GroupWriter GroupWriter { get; private set; }
+
         public bool HighlightSplit => (HighlightOptions & HighlightOptions.Split) != 0;
 
         public bool HighlightBoundary => (HighlightOptions & HighlightOptions.Boundary) != 0;
@@ -110,7 +112,15 @@ namespace Orang.CommandLine
                     cancellationToken.ThrowIfCancellationRequested();
 
                     valueWriter.Write(input, lastPos, matchItem.Match.Index - lastPos, symbols: null);
-                    valueWriter.WriteMatch(matchItem.Match.Value, symbols);
+
+                    if (addDetails)
+                    {
+                        (GroupWriter ?? (GroupWriter = new GroupWriter(valueWriter, Writer))).WriteMatch(input, matchItem, groupNumber, symbols);
+                    }
+                    else
+                    {
+                        valueWriter.WriteMatch(matchItem.Match.Value, symbols);
+                    }
 
                     captureCount += matchItem.GroupItems
                         .Where(f => (groupNumber >= 0) ? groupNumber == f.Number : true)
