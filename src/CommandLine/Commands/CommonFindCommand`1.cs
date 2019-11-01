@@ -60,6 +60,11 @@ namespace Orang.CommandLine
 
         protected virtual void ExecuteCore(SearchContext context)
         {
+            LogHelpers.WriteFilter(Options.NameFilter, "name", Verbosity.Diagnostic);
+            LogHelpers.WriteFilter(Options.ExtensionFilter, "extension", Verbosity.Diagnostic);
+            LogHelpers.WriteFilter(Options.ContentFilter, "content", Verbosity.Diagnostic);
+            LogHelpers.WriteFilter(Options.DirectoryFilter, "directory", Verbosity.Diagnostic);
+
             Stopwatch stopwatch = Stopwatch.StartNew();
 
             foreach (string path in Options.Paths)

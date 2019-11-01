@@ -37,6 +37,7 @@ namespace Orang.FileSystem
         {
             if (value.Error != null)
             {
+                WriteWarning(value.Error, verbosity: Verbosity.Diagnostic);
                 return;
             }
 

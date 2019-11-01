@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Orang.FileSystem;
 using static Orang.Logger;
 
@@ -11,6 +12,28 @@ namespace Orang.CommandLine
 {
     internal static class LogHelpers
     {
+        public static void WriteFilter(Filter filter, string name, Verbosity verbosity)
+        {
+            if (filter == null)
+                return;
+
+            if (!ShouldLog(verbosity))
+                return;
+
+            RegexOptions regexOptions = filter.Regex.Options;
+
+            string options = (regexOptions == RegexOptions.None)
+                ? regexOptions.ToString()
+                : string.Join(", ", regexOptions.GetFlags().OrderBy(f => f.ToString()));
+
+            WriteLine($"{name} filter:", verbosity);
+            WriteLine($"  pattern:  {filter.Regex}", verbosity);
+            WriteLine($"  options:  {options}", verbosity);
+            WriteLine($"  negative: {filter.IsNegative.ToString().ToLowerInvariant()}", verbosity);
+            WriteLine($"  group:    {((string.IsNullOrEmpty(filter.GroupName)) ? "-" : filter.GroupName)}", verbosity);
+            WriteLine($"  part:     {filter.NamePart}", verbosity);
+        }
+
         public static void WriteFileError(Exception ex, string path = null, string basePath = null, ConsoleColors colors = default, string indent = null, Verbosity verbosity = Verbosity.Normal)
         {
             if (colors.IsDefault)
