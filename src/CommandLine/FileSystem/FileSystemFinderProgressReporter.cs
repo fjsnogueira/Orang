@@ -10,11 +10,11 @@ namespace Orang.FileSystem
     {
         public FileSystemFinderProgressReporter(
             ProgressReportMode consoleReportMode,
-            ProgressReportMode fileLogReportMode,
+            ProgressReportMode fileReportMode,
             CommonFindCommandOptions options)
         {
             ConsoleReportMode = consoleReportMode;
-            FileLogReportMode = fileLogReportMode;
+            FileReportMode = fileReportMode;
             Options = options;
         }
 
@@ -22,7 +22,7 @@ namespace Orang.FileSystem
 
         public ProgressReportMode ConsoleReportMode { get; }
 
-        public ProgressReportMode FileLogReportMode { get; }
+        public ProgressReportMode FileReportMode { get; }
 
         public CommonFindCommandOptions Options { get; }
 
@@ -52,7 +52,7 @@ namespace Orang.FileSystem
                         {
                             WritePath(value, verbosity: Verbosity.Diagnostic);
                         }
-                        else if (FileLogReportMode == ProgressReportMode.Path)
+                        else if (FileReportMode == ProgressReportMode.Path)
                         {
                             WritePath(value, indent: null);
                         }
@@ -88,14 +88,14 @@ namespace Orang.FileSystem
                     ProgressReported = true;
                 }
 
-                if (FileLogReportMode == ProgressReportMode.Path)
+                if (FileReportMode == ProgressReportMode.Path)
                     WritePath(value, indent: Options.Indent);
             }
             else if (ConsoleReportMode == ProgressReportMode.Path)
             {
                 WritePath(value, indent: Options.Indent, verbosity: Verbosity.Diagnostic);
             }
-            else if (FileLogReportMode == ProgressReportMode.Path)
+            else if (FileReportMode == ProgressReportMode.Path)
             {
                 WritePath(value, indent: Options.Indent);
             }
