@@ -2,12 +2,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Text;
 using Orang.FileSystem;
 using static Orang.Logger;
 
@@ -85,6 +82,12 @@ namespace Orang.CommandLine
                     Write("  ", verbosity);
 
                 WriteCount("Directories searched", telemetry.DirectoryCount, verbosity: verbosity);
+            }
+
+            if (searchTarget != SearchTarget.Directories
+                && telemetry.FilesTotalSize > 0)
+            {
+                WriteCount("  Files total size", telemetry.FilesTotalSize, verbosity: verbosity);
             }
 
             if (telemetry.Elapsed != default)
@@ -196,6 +199,11 @@ namespace Orang.CommandLine
             return WriteCount(name, count.ToString("n0"), colors, verbosity);
         }
 
+        public static int WriteCount(string name, long count, in ConsoleColors colors = default, Verbosity verbosity = Verbosity.Quiet)
+        {
+            return WriteCount(name, count.ToString("n0"), colors, verbosity);
+        }
+
         public static int WriteCount(string name, string count, in ConsoleColors colors = default, Verbosity verbosity = Verbosity.Quiet)
         {
             return WriteCount(name, count, name.Length, count.Length, colors, verbosity);
@@ -223,8 +231,6 @@ namespace Orang.CommandLine
             in ConsoleColors colors,
             in ConsoleColors matchColors,
             string indent,
-            ImmutableArray<FileProperty> fileProperties,
-            ColumnWidths columnWidths,
             Verbosity verbosity = Verbosity.Quiet)
         {
             WritePathImpl(
@@ -237,12 +243,6 @@ namespace Orang.CommandLine
                 matchColors: matchColors,
                 indent: indent,
                 verbosity: verbosity);
-
-            if (columnWidths != null && ShouldLog(verbosity))
-            {
-                string s = GetFilePropertiesText(result, fileProperties, columnWidths);
-                Write(s, verbosity);
-            }
         }
 
         public static void WritePath(
@@ -323,59 +323,6 @@ namespace Orang.CommandLine
 
                 Write(path, startIndex, path.Length - startIndex, colors: colors, verbosity);
             }
-        }
-
-        private static string GetFilePropertiesText(
-            FileSystemFinderResult result,
-            ImmutableArray<FileProperty> fileProperties,
-            ColumnWidths columnWidths)
-        {
-            StringBuilder sb = StringBuilderCache.GetInstance();
-
-            sb.Append(' ', columnWidths.NameWidth - result.Path.Length);
-
-            foreach (FileProperty fileProperty in fileProperties)
-            {
-                switch (fileProperty)
-                {
-                    case FileProperty.Size:
-                        {
-                            sb.Append("  ");
-
-                            if (result.IsDirectory)
-                            {
-                                sb.Append(' ', columnWidths.SizeWidth);
-                            }
-                            else
-                            {
-                                string s = new FileInfo(result.Path).Length.ToString("n0");
-
-                                sb.Append(' ', columnWidths.SizeWidth - s.Length);
-                                sb.Append(s);
-                            }
-
-                            break;
-                        }
-                    case FileProperty.CreationTime:
-                        {
-                            sb.Append("  ");
-                            sb.Append(File.GetCreationTime(result.Path).ToString("yyyy-MM-dd HH:mm:ss"));
-                            break;
-                        }
-                    case FileProperty.ModifiedTime:
-                        {
-                            sb.Append("  ");
-                            sb.Append(File.GetLastWriteTime(result.Path).ToString("yyyy-MM-dd HH:mm:ss"));
-                            break;
-                        }
-                    default:
-                        {
-                            throw new InvalidOperationException($"Unknown enum value '{fileProperty}'.");
-                        }
-                }
-            }
-
-            return StringBuilderCache.GetStringAndFree(sb);
         }
     }
 }
