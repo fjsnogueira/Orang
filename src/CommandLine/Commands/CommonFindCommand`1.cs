@@ -14,7 +14,7 @@ using static Orang.Logger;
 
 namespace Orang.CommandLine
 {
-    internal abstract class CommonFindCommand<TOptions> : AbstractCommand where TOptions : CommonFindCommandOptions
+    internal abstract class CommonFindCommand<TOptions> : AbstractCommand<TOptions> where TOptions : CommonFindCommandOptions
     {
         protected CommonFindCommand(TOptions options)
         {

@@ -2,7 +2,7 @@
 
 namespace Orang.CommandLine
 {
-    internal abstract class RegexCommand<TOptions> : AbstractCommand where TOptions : RegexCommandOptions
+    internal abstract class RegexCommand<TOptions> : AbstractCommand<TOptions> where TOptions : RegexCommandOptions
     {
         protected RegexCommand(TOptions options)
         {

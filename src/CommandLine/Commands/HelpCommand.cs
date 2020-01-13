@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Orang.CommandLine
 {
-    internal class HelpCommand : AbstractCommand
+    internal class HelpCommand : AbstractCommand<HelpCommandOptions>
     {
         public HelpCommand(HelpCommandOptions options)
         {

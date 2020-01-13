@@ -6,7 +6,7 @@ using static Orang.Logger;
 
 namespace Orang.CommandLine
 {
-    internal abstract class AbstractCommand
+    internal abstract class AbstractCommand<TOptions> where TOptions : AbstractCommandOptions
     {
         protected AbstractCommand()
         {

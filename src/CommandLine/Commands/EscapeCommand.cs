@@ -5,7 +5,7 @@ using static Orang.Logger;
 
 namespace Orang.CommandLine
 {
-    internal class EscapeCommand : AbstractCommand
+    internal class EscapeCommand : AbstractCommand<EscapeCommandOptions>
     {
         public EscapeCommand(EscapeCommandOptions options)
         {

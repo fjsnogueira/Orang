@@ -2,12 +2,7 @@
 
 namespace Orang.CommandLine
 {
-    internal abstract class CommonListCommandOptions : AbstractCommandOptions
+    internal class AbstractCommandOptions
     {
-        internal CommonListCommandOptions()
-        {
-        }
-
-        public string Filter { get; internal set; }
     }
 }
