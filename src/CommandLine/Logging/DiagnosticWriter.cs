@@ -6,6 +6,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Orang.FileSystem;
 using System.Reflection;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace Orang.CommandLine
 {
@@ -101,16 +103,17 @@ namespace Orang.CommandLine
             WriteDisplayFormat("display", options.Format);
             WriteOption("dry run", options.DryRun);
             WriteOption("empty", options.Empty);
-            WriteEvaluator("evaluator", options.MatchEvaluator);
+            WriteEvaluator("evaluator", options.ReplaceOptions.MatchEvaluator);
             WriteFilter("extension filter", options.ExtensionFilter);
             WriteFilePropertyFilter("file property filter", options.FilePropertyFilter);
             WriteOption("highlight options", options.HighlightOptions);
             WriteOption("max matching files", options.MaxMatchingFiles);
+            WriteModify("modify", options.ReplaceOptions);
             WriteFilter("name filter", options.NameFilter);
             WritePaths("paths", options.Paths);
             WriteOption("progress", options.Progress);
             WriteOption("recurse subdirectories", options.RecurseSubdirectories);
-            WriteOption("replacement", options.Replacement);
+            WriteOption("replacement", options.ReplaceOptions.Replacement);
             WriteOption("search target", options.SearchTarget);
             WriteSortOptions("sort", options.SortOptions);
         }
@@ -126,7 +129,7 @@ namespace Orang.CommandLine
             WriteDisplayFormat("display", options.Format);
             WriteOption("dry run", options.DryRun);
             WriteOption("empty", options.Empty);
-            WriteEvaluator("evaluator", options.MatchEvaluator);
+            WriteEvaluator("evaluator", options.ReplaceOptions.MatchEvaluator);
             WriteFilter("extension filter", options.ExtensionFilter);
             WriteFilePropertyFilter("file property filter", options.FilePropertyFilter);
             WriteOption("highlight options", options.HighlightOptions);
@@ -134,11 +137,12 @@ namespace Orang.CommandLine
             WriteOption("max matches", options.MaxMatches);
             WriteOption("max matches in file", options.MaxMatchesInFile);
             WriteOption("max matching files", options.MaxMatchingFiles);
+            WriteModify("modify", options.ReplaceOptions);
             WriteFilter("name filter", options.NameFilter);
             WritePaths("paths", options.Paths);
             WriteOption("progress", options.Progress);
             WriteOption("recurse subdirectories", options.RecurseSubdirectories);
-            WriteOption("replacement", options.Replacement);
+            WriteOption("replacement", options.ReplaceOptions.Replacement);
             WriteOption("search target", options.SearchTarget);
             WriteSortOptions("sort", options.SortOptions);
         }
@@ -357,20 +361,47 @@ namespace Orang.CommandLine
         {
             WriteName(name);
 
-            if (matchEvaluator != null)
+            if (matchEvaluator != null
+                && !object.ReferenceEquals(matchEvaluator.Method.DeclaringType.Assembly, typeof(Program).Assembly))
             {
-                MethodInfo method = matchEvaluator.Method;
-
                 WriteLine();
                 WriteIndent();
-                WriteOption("type", method.DeclaringType.AssemblyQualifiedName);
+                WriteOption("type", matchEvaluator.Method.DeclaringType.AssemblyQualifiedName);
                 WriteIndent();
-                WriteOption("method", method.Name);
+                WriteOption("method", matchEvaluator.Method.Name);
+            }
+            else
+            {
+                WriteUnspecifiedValue();
+                WriteLine();
+            }
+        }
+
+        private static void WriteModify(string name, ReplaceOptions options)
+        {
+            WriteName(name);
+
+            if (options.Functions != ReplaceFunctions.None)
+            {
+                if (options.CultureInvariant)
+                {
+                    WriteValue(nameof(options.CultureInvariant) + ", " + options.Functions.ToString());
+                }
+                else
+                {
+                    WriteValue(options.Functions.ToString());
+                }
+            }
+            else if (options.CultureInvariant)
+            {
+                WriteValue(nameof(options.CultureInvariant));
             }
             else
             {
                 WriteUnspecifiedValue();
             }
+
+            WriteLine();
         }
 
         private static void WriteValue(bool value)
