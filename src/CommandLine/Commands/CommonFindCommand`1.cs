@@ -102,9 +102,9 @@ namespace Orang.CommandLine
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            foreach (string path in Options.Paths)
+            foreach (PathInfo pathInfo in Options.Paths)
             {
-                ExecuteCore(path, context);
+                ExecuteCore(pathInfo.Path, context);
 
                 if (context.TerminationReason == TerminationReason.MaxReached)
                     break;
@@ -139,7 +139,7 @@ namespace Orang.CommandLine
                 {
                     context.Telemetry.Elapsed = stopwatch.Elapsed;
 
-                    WriteSummary(context.Telemetry, (Options.IncludeSummary) ? Verbosity.Minimal : Verbosity.Detailed);
+                    WriteSummary(context.Telemetry, (Options.IncludeSummary) ? Verbosity.Quiet : Verbosity.Detailed);
                 }
             }
         }

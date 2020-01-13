@@ -52,7 +52,7 @@ namespace Orang.CommandLine
 
             if (!string.IsNullOrEmpty(path)
                 && !string.IsNullOrEmpty(message)
-                && !message.Contains(path, StringComparison.OrdinalIgnoreCase))
+                && !message.Contains(path, FileSystemHelpers.Comparison))
             {
                 Write($"{indent}PATH: ", colors, verbosity);
                 WritePath(path, basePath, relativePath: relativePath, colors: colors, verbosity: verbosity);
@@ -98,6 +98,7 @@ namespace Orang.CommandLine
             SearchTarget searchTarget,
             string processedFilesTitle,
             string processedDirectoriesTitle,
+            bool dryRun,
             Verbosity verbosity = Verbosity.Detailed)
         {
             if (!ShouldLog(verbosity))
@@ -121,28 +122,32 @@ namespace Orang.CommandLine
             int width3 = Math.Max(directoriesTitle.Length, processedDirectoriesTitle.Length);
             int width4 = Math.Max(matchingDirectoryCount.Length, processedDirectoryCount.Length);
 
+            ConsoleColors colors = Colors.Message_OK;
+
             if (files)
-                WriteCount(filesTitle, matchingFileCount, width1, width2, Colors.Message_OK, verbosity);
+                WriteCount(filesTitle, matchingFileCount, width1, width2, colors, verbosity);
 
             if (directories)
             {
                 if (files)
-                    Write("  ", Colors.Message_Change, verbosity);
+                    Write("  ", colors, verbosity);
 
-                WriteCount(directoriesTitle, matchingDirectoryCount, width3, width4, Colors.Message_OK, verbosity);
+                WriteCount(directoriesTitle, matchingDirectoryCount, width3, width4, colors, verbosity);
             }
 
             WriteLine(verbosity);
 
+            colors = (dryRun) ? Colors.Message_DryRun : Colors.Message_Change;
+
             if (files)
-                WriteCount(processedFilesTitle, processedFileCount, width1, width2, Colors.Message_Change, verbosity);
+                WriteCount(processedFilesTitle, processedFileCount, width1, width2, colors, verbosity);
 
             if (directories)
             {
                 if (files)
-                    Write("  ", Colors.Message_Change, verbosity);
+                    Write("  ", colors, verbosity);
 
-                WriteCount(processedDirectoriesTitle, processedDirectoryCount, width3, width4, Colors.Message_Change, verbosity);
+                WriteCount(processedDirectoriesTitle, processedDirectoryCount, width3, width4, colors, verbosity);
             }
 
             WriteLine(verbosity);
@@ -233,7 +238,7 @@ namespace Orang.CommandLine
             string path = result.Path;
             int matchIndex = result.Index;
 
-            (int startIndex, bool isWritten) = WritePathImpl(path, basePath, relativePath, colors, matchColors, matchIndex, indent, verbosity);
+            (int startIndex, bool isWritten) = WritePathImpl(path, basePath, relativePath, colors, stopAtMatch: !matchColors.IsDefault, matchIndex, indent, verbosity);
 
             if (!isWritten)
             {
@@ -252,13 +257,14 @@ namespace Orang.CommandLine
             bool relativePath,
             in ConsoleColors colors,
             in ConsoleColors matchColors,
+            in ConsoleColors replaceColors,
             string indent,
             Verbosity verbosity = Verbosity.Quiet)
         {
             string path = result.Path;
             int matchIndex = result.Part.Index + result.Index;
 
-            (int startIndex, bool isWritten) = WritePathImpl(path, basePath, relativePath, colors, matchColors, matchIndex, indent, verbosity);
+            (int startIndex, bool isWritten) = WritePathImpl(path, basePath, relativePath, colors, stopAtMatch: true, matchIndex, indent, verbosity);
 
             if (!isWritten)
             {
@@ -267,7 +273,12 @@ namespace Orang.CommandLine
                     Match match = item.Match;
 
                     Write(path, startIndex, result.Part.Index + match.Index - startIndex);
-                    Write(match.Value, matchColors);
+
+                    if (!matchColors.IsDefault)
+                        Write(match.Value, matchColors);
+
+                    Write(item.Value, replaceColors);
+
                     startIndex = result.Part.Index + match.Index + match.Length;
                 }
 
@@ -291,7 +302,7 @@ namespace Orang.CommandLine
             string basePath,
             bool relativePath,
             in ConsoleColors colors,
-            in ConsoleColors matchColors = default,
+            bool stopAtMatch = false,
             int matchIndex = -1,
             string indent = null,
             Verbosity verbosity = Verbosity.Quiet)
@@ -301,7 +312,7 @@ namespace Orang.CommandLine
 
             Write(indent, verbosity);
 
-            if (string.Equals(path, basePath, StringComparison.OrdinalIgnoreCase))
+            if (string.Equals(path, basePath, FileSystemHelpers.Comparison))
             {
                 Debug.Assert(matchIndex == -1);
                 Write((relativePath) ? "." : path, colors, verbosity);
@@ -312,7 +323,7 @@ namespace Orang.CommandLine
 
             if (basePath != null
                 && path.Length > basePath.Length
-                && path.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+                && path.StartsWith(basePath, FileSystemHelpers.Comparison))
             {
                 startIndex = basePath.Length;
 
@@ -321,7 +332,7 @@ namespace Orang.CommandLine
             }
 
             if (matchIndex >= 0
-                && !matchColors.IsDefault)
+                && stopAtMatch)
             {
                 if (matchIndex < startIndex)
                 {
