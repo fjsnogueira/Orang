@@ -16,7 +16,6 @@ namespace Orang.CommandLine
 
         internal override void WriteDiagnostic()
         {
-            DiagnosticWriter.WriteHelpCommand(this);
         }
     }
 }

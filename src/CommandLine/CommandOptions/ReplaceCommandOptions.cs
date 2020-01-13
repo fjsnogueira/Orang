@@ -20,7 +20,7 @@ namespace Orang.CommandLine
 
         internal override void WriteDiagnostic()
         {
-            throw new System.NotImplementedException();
+            DiagnosticWriter.WriteCommand(this);
         }
     }
 }

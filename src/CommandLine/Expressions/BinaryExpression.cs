@@ -4,7 +4,7 @@ namespace Orang.Expressions
 {
     internal class BinaryExpression : Expression
     {
-        public BinaryExpression(string identifier, string value, ExpressionKind kind) : base(identifier)
+        public BinaryExpression(string expressionText, string identifier, string value, ExpressionKind kind) : base(expressionText, identifier)
         {
             Value = value;
             Kind = kind;
