@@ -285,7 +285,7 @@ namespace Orang.CommandLine
             var command = new UnescapeCommand(options);
         }
 
-        private static int Execute(AbstractCommand command)
+        private static int Execute<TOptions>(AbstractCommand<TOptions> command) where TOptions : AbstractCommandOptions
         {
             CommandResult result = command.Execute();
 
