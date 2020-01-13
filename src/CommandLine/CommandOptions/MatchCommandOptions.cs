@@ -7,5 +7,10 @@ namespace Orang.CommandLine
         internal MatchCommandOptions()
         {
         }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

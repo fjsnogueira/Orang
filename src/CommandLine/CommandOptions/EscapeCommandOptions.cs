@@ -13,5 +13,10 @@ namespace Orang.CommandLine
         public bool InCharGroup { get; internal set; }
 
         public bool Replacement { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

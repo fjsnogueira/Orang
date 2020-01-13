@@ -2,7 +2,8 @@
 
 namespace Orang.CommandLine
 {
-    internal class AbstractCommandOptions
+    internal abstract class AbstractCommandOptions
     {
+        internal abstract void WriteDiagnostic();
     }
 }

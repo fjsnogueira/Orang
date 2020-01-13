@@ -12,5 +12,10 @@ namespace Orang.CommandLine
         }
 
         public ImmutableArray<SyntaxSection> Sections { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

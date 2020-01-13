@@ -13,5 +13,10 @@ namespace Orang.CommandLine
         public bool IncludeValues { get; internal set; }
 
         public bool Manual { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            DiagnosticWriter.WriteHelpCommand(this);
+        }
     }
 }

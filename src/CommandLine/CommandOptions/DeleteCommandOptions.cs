@@ -19,5 +19,10 @@ namespace Orang.CommandLine
         public bool DirectoriesOnly { get; internal set; }
 
         public bool DryRun { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

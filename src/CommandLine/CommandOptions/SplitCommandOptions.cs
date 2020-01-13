@@ -9,5 +9,10 @@ namespace Orang.CommandLine
         }
 
         public bool OmitGroups { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

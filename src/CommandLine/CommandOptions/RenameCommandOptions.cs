@@ -17,5 +17,10 @@ namespace Orang.CommandLine
         public bool DryRun { get; internal set; }
 
         public MatchEvaluator MatchEvaluator { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

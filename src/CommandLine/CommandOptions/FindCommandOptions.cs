@@ -13,5 +13,10 @@ namespace Orang.CommandLine
         public int MaxMatches { get; internal set; }
 
         public int MaxMatchesInFile { get; internal set; }
+
+        internal override void WriteDiagnostic()
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
