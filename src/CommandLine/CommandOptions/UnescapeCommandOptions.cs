@@ -2,7 +2,7 @@
 
 namespace Orang.CommandLine
 {
-    internal class UnescapeCommandOptions
+    internal class UnescapeCommandOptions : AbstractCommandOptions
     {
         internal UnescapeCommandOptions()
         {

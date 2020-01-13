@@ -269,20 +269,16 @@ namespace Orang.CommandLine
                 return 2;
 
             return Execute(new SplitCommand(options));
-
-            CommandResult result = command.Execute();
-
-            return GetExitCode(result.Kind);
         }
 
         private static int Unescape(UnescapeCommandLineOptions commandLineOptions)
         {
             var options = new UnescapeCommandOptions();
 
-            if (!commandLineOptions.TryParse(ref options))
+            if (!commandLineOptions.TryParse(options))
                 return 1;
 
-            var command = new UnescapeCommand(options);
+            return Execute(new UnescapeCommand(options));
         }
 
         private static int Execute<TOptions>(AbstractCommand<TOptions> command) where TOptions : AbstractCommandOptions

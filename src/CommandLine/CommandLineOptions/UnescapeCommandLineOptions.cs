@@ -13,7 +13,7 @@ namespace Orang.CommandLine
             MetaValue = MetaValues.Input)]
         public string Input { get; set; }
 
-        public bool TryParse(ref UnescapeCommandOptions options)
+        public bool TryParse(UnescapeCommandOptions options)
         {
             options.Input = Input;
 

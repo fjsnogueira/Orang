@@ -6,14 +6,11 @@ using static Orang.Logger;
 
 namespace Orang.CommandLine
 {
-    internal class UnescapeCommand : AbstractCommand
+    internal class UnescapeCommand : AbstractCommand<UnescapeCommandOptions>
     {
-        public UnescapeCommand(UnescapeCommandOptions options)
+        public UnescapeCommand(UnescapeCommandOptions options) : base(options)
         {
-            Options = options;
         }
-
-        public UnescapeCommandOptions Options { get; }
 
         protected override CommandResult ExecuteCore(CancellationToken cancellationToken = default)
         {
