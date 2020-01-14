@@ -5,9 +5,6 @@ using System.Collections.Immutable;
 using System.Text;
 using System.Text.RegularExpressions;
 using Orang.FileSystem;
-using System.Reflection;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Orang.CommandLine
 {
@@ -17,7 +14,13 @@ namespace Orang.CommandLine
 
         private static ConsoleColors ValueColors { get; } = new ConsoleColors(ConsoleColor.Cyan);
 
-        private static ConsoleColors UnspecifiedColors { get; } = new ConsoleColors(ConsoleColor.DarkGray);
+        private static ConsoleColors NullValueColors { get; } = new ConsoleColors(ConsoleColor.DarkGray);
+
+        private static ValueWriter ValueWriter { get; } = new ValueWriter(new ContentTextWriter(Verbosity.Diagnostic));
+
+        private static OutputSymbols Symbols_Character { get; } = OutputSymbols.Create(HighlightOptions.Character);
+
+        private static OutputSymbols Symbols_NewLine { get; } = OutputSymbols.Create(HighlightOptions.NewLine);
 
         internal static void WriteCommand(DeleteCommandOptions options)
         {
@@ -33,7 +36,7 @@ namespace Orang.CommandLine
             WriteOption("dry run", options.DryRun);
             WriteOption("empty", options.Empty);
             WriteFilter("extension filter", options.ExtensionFilter);
-            WriteFilePropertyFilter("file property filter", options.FilePropertyFilter);
+            WriteFilePropertyFilter("file properties", options.FilePropertyFilter);
             WriteOption("files only", options.FilesOnly);
             WriteOption("highlight options", options.HighlightOptions);
             WriteOption("including bom", options.IncludingBom);
@@ -64,7 +67,7 @@ namespace Orang.CommandLine
             WriteDisplayFormat("display", options.Format);
             WriteOption("empty", options.Empty);
             WriteFilter("extension filter", options.ExtensionFilter);
-            WriteFilePropertyFilter("file property filter", options.FilePropertyFilter);
+            WriteFilePropertyFilter("file properties", options.FilePropertyFilter);
             WriteOption("highlight options", options.HighlightOptions);
             WriteOption("max matches", options.MaxMatches);
             WriteOption("max matches in file", options.MaxMatchesInFile);
@@ -105,7 +108,7 @@ namespace Orang.CommandLine
             WriteOption("empty", options.Empty);
             WriteEvaluator("evaluator", options.ReplaceOptions.MatchEvaluator);
             WriteFilter("extension filter", options.ExtensionFilter);
-            WriteFilePropertyFilter("file property filter", options.FilePropertyFilter);
+            WriteFilePropertyFilter("file properties", options.FilePropertyFilter);
             WriteOption("highlight options", options.HighlightOptions);
             WriteOption("max matching files", options.MaxMatchingFiles);
             WriteModify("modify", options.ReplaceOptions);
@@ -131,7 +134,7 @@ namespace Orang.CommandLine
             WriteOption("empty", options.Empty);
             WriteEvaluator("evaluator", options.ReplaceOptions.MatchEvaluator);
             WriteFilter("extension filter", options.ExtensionFilter);
-            WriteFilePropertyFilter("file property filter", options.FilePropertyFilter);
+            WriteFilePropertyFilter("file properties", options.FilePropertyFilter);
             WriteOption("highlight options", options.HighlightOptions);
             WriteOption("input", options.Input);
             WriteOption("max matches", options.MaxMatches);
@@ -177,7 +180,7 @@ namespace Orang.CommandLine
 
             if (value == null)
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
             }
             else
             {
@@ -187,10 +190,10 @@ namespace Orang.CommandLine
             WriteLine();
         }
 
-        private static void WriteOption(string name, string value)
+        private static void WriteOption(string name, string value, bool replaceAllSymbols = false)
         {
             WriteName(name);
-            WriteValue(value);
+            WriteValue(value, replaceAllSymbols: replaceAllSymbols);
             WriteLine();
         }
 
@@ -221,7 +224,7 @@ namespace Orang.CommandLine
 
             if (filter == null)
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
                 WriteLine();
                 return;
             }
@@ -242,7 +245,7 @@ namespace Orang.CommandLine
 
             if (string.IsNullOrEmpty(filter.GroupName))
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
                 WriteLine();
             }
             else
@@ -259,19 +262,19 @@ namespace Orang.CommandLine
         {
             WriteName(name);
 
-            if (filter == null)
+            if (filter.IsDefault)
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
                 WriteLine();
-                return;
             }
-
-            WriteLine();
-
-            WriteIndent();
-            WriteFilterPredicate("creation time", filter.CreationTimePredicate);
-            WriteFilterPredicate("modified time", filter.ModifiedTimePredicate);
-            WriteFilterPredicate("size", filter.SizePredicate);
+            else
+            {
+                WriteLine();
+                WriteIndent();
+                WriteFilterPredicate("creation time", filter.CreationTimePredicate);
+                WriteFilterPredicate("modified time", filter.ModifiedTimePredicate);
+                WriteFilterPredicate("size", filter.SizePredicate);
+            }
 
             static void WriteFilterPredicate<T>(string name, FilterPredicate<T> filterPredicate)
             {
@@ -293,7 +296,7 @@ namespace Orang.CommandLine
 
             if (format == null)
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
                 WriteLine();
                 return;
             }
@@ -308,13 +311,13 @@ namespace Orang.CommandLine
             WriteIndent();
             WriteOption("include base directory", format.IncludeBaseDirectory);
             WriteIndent();
-            WriteOption("indent", format.Indent);
+            WriteOption("indent", format.Indent, replaceAllSymbols: true);
             WriteIndent();
             WriteOption("line options", format.LineOptions);
             WriteIndent();
             WriteOption("path display", format.PathDisplayStyle);
             WriteIndent();
-            WriteOption("separator", format.Separator);
+            WriteOption("separator", format.Separator, replaceAllSymbols: true);
         }
 
         private static void WriteSortOptions(string name, SortOptions options)
@@ -323,7 +326,7 @@ namespace Orang.CommandLine
 
             if (options == null)
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
                 WriteLine();
                 return;
             }
@@ -372,7 +375,7 @@ namespace Orang.CommandLine
             }
             else
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
                 WriteLine();
             }
         }
@@ -398,7 +401,7 @@ namespace Orang.CommandLine
             }
             else
             {
-                WriteUnspecifiedValue();
+                WriteNullValue();
             }
 
             WriteLine();
@@ -410,19 +413,33 @@ namespace Orang.CommandLine
             Write((value) ? "true" : "false");
         }
 
-        private static void WriteValue(string value)
+        private static void WriteValue(string value, bool replaceAllSymbols = false)
         {
             WriteIndent();
-            Write(value);
+
+            if (replaceAllSymbols)
+            {
+                ValueWriter.Write(value, Symbols_Character, ValueColors);
+            }
+            else
+            {
+                ValueWriter.Write(value, Symbols_NewLine, ValueColors);
+            }
         }
 
         private static void WriteValues<T>(ImmutableArray<T> values)
         {
-            foreach (T value in values)
+            if (values.IsEmpty)
             {
-                WriteValue(value.ToString());
-                WriteLine();
+                WriteNullValue();
             }
+            else
+            {
+                foreach (T value in values)
+                    WriteValue(value.ToString());
+            }
+
+            WriteLine();
         }
 
         private static void WriteIndent()
@@ -436,10 +453,10 @@ namespace Orang.CommandLine
             Logger.Write(":", Verbosity);
         }
 
-        private static void WriteUnspecifiedValue()
+        private static void WriteNullValue()
         {
             WriteIndent();
-            Logger.Write("<unspecified>", UnspecifiedColors, Verbosity);
+            Logger.Write("<none>", NullValueColors, Verbosity);
         }
 
         private static void Write(string value)

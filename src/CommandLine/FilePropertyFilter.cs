@@ -24,6 +24,16 @@ namespace Orang.CommandLine
 
         public FilterPredicate<DateTime> ModifiedTimePredicate { get; }
 
+        internal bool IsDefault
+        {
+            get
+            {
+                return SizePredicate == null
+                    && CreationTimePredicate == null
+                    && ModifiedTimePredicate == null;
+            }
+        }
+
         public bool IsMatch(FileSystemFinderResult result)
         {
             return IsMatch(result.Path, result.IsDirectory);
