@@ -16,7 +16,7 @@ namespace Orang.CommandLine
 
         private static ConsoleColors NullValueColors { get; } = new ConsoleColors(ConsoleColor.DarkGray);
 
-        private static ValueWriter ValueWriter { get; } = new ValueWriter(new ContentTextWriter(Verbosity.Diagnostic));
+        private static ValueWriter ValueWriter { get; } = new ValueWriter(new ContentTextWriter(Verbosity.Diagnostic), includeEndingIndent: false);
 
         private static OutputSymbols Symbols_Character { get; } = OutputSymbols.Create(HighlightOptions.Character);
 
@@ -207,8 +207,17 @@ namespace Orang.CommandLine
         private static void WriteOption<TEnum>(string name, ImmutableArray<TEnum> values) where TEnum : Enum
         {
             WriteName(name);
+
+            if (values.IsEmpty)
+            {
+                WriteNullValue();
+            }
+            else
+            {
+                WriteValue(string.Join(", ", values));
+            }
+
             WriteLine();
-            WriteValues(values);
         }
 
         private static void WriteEncoding(string name, Encoding encoding)
@@ -232,16 +241,18 @@ namespace Orang.CommandLine
             WriteLine();
             WriteIndent();
             WriteName("pattern");
-            WriteLine($"  {filter.Regex}");
+            WriteIndent();
+            WriteLine(filter.Regex.ToString());
             WriteIndent();
             WriteName("options");
-            WriteLine($"  {filter.Regex.Options.ToString()}");
+            WriteIndent();
+            WriteLine(filter.Regex.Options.ToString());
             WriteIndent();
             WriteName("negative");
-            WriteLine($" {filter.IsNegative.ToString().ToLowerInvariant()}");
+            WriteIndent();
+            WriteLine(filter.IsNegative.ToString().ToLowerInvariant());
             WriteIndent();
             WriteName("group");
-            Write("   ");
 
             if (string.IsNullOrEmpty(filter.GroupName))
             {
@@ -250,12 +261,14 @@ namespace Orang.CommandLine
             }
             else
             {
+                WriteIndent();
                 WriteLine(filter.GroupName);
             }
 
             WriteIndent();
             WriteName("part");
-            WriteLine($"     {filter.NamePart}");
+            WriteIndent();
+            WriteLine(filter.NamePart.ToString());
         }
 
         private static void WriteFilePropertyFilter(string name, FilePropertyFilter filter)
@@ -354,7 +367,6 @@ namespace Orang.CommandLine
 
             foreach (PathInfo path in paths)
             {
-                WriteIndent();
                 WriteValue($"{path.Origin} {path.Path}");
                 WriteLine();
             }
@@ -427,24 +439,9 @@ namespace Orang.CommandLine
             }
         }
 
-        private static void WriteValues<T>(ImmutableArray<T> values)
-        {
-            if (values.IsEmpty)
-            {
-                WriteNullValue();
-            }
-            else
-            {
-                foreach (T value in values)
-                    WriteValue(value.ToString());
-            }
-
-            WriteLine();
-        }
-
         private static void WriteIndent()
         {
-            Write(" ");
+            Write("  ");
         }
 
         private static void WriteName(string name)
