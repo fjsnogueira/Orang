@@ -81,6 +81,11 @@ namespace Orang
             WriteLineIf(verbosity <= Verbosity, value);
         }
 
+        public void WriteLine(ReadOnlySpan<char> buffer, Verbosity verbosity)
+        {
+            WriteLineIf(verbosity <= Verbosity, buffer);
+        }
+
         public void WriteLineIf(bool condition)
         {
             if (condition)
@@ -96,6 +101,12 @@ namespace Orang
         {
             if (condition)
                 WriteLine(value);
+        }
+
+        public void WriteLineIf(bool condition, ReadOnlySpan<char> buffer)
+        {
+            if (condition)
+                WriteLine(buffer);
         }
 
         public override void Write(bool value)
@@ -245,6 +256,11 @@ namespace Orang
         public override void WriteLine(string value)
         {
             Writer.WriteLine(value);
+        }
+
+        public override void WriteLine(ReadOnlySpan<char> buffer)
+        {
+            Writer.WriteLine(buffer);
         }
 
         public override void WriteLine(string format, object arg0)

@@ -54,11 +54,11 @@ namespace Orang.FileSystem
 
                         if (ConsoleReportMode == ProgressReportMode.Path)
                         {
-                            WritePath(value, verbosity: Verbosity.Diagnostic);
+                            WritePath(value.Path, value.Kind, Indent);
                         }
                         else if (FileReportMode == ProgressReportMode.Path)
                         {
-                            WritePath(value, indent: null);
+                            WritePathToFile(value.Path, value.Kind);
                         }
 
                         break;
@@ -66,13 +66,13 @@ namespace Orang.FileSystem
                 case ProgressKind.Directory:
                     {
                         DirectoryCount++;
-                        WritePath(value);
+                        WritePath(value.Path, value.Kind);
                         break;
                     }
                 case ProgressKind.File:
                     {
                         FileCount++;
-                        WritePath(value);
+                        WritePath(value.Path, value.Kind);
                         break;
                     }
                 default:
@@ -82,7 +82,7 @@ namespace Orang.FileSystem
             }
         }
 
-        private void WritePath(in FileSystemFinderProgress value)
+        private void WritePath(string path, ProgressKind kind)
         {
             if (ConsoleReportMode == ProgressReportMode.Dot)
             {
@@ -93,41 +93,87 @@ namespace Orang.FileSystem
                 }
 
                 if (FileReportMode == ProgressReportMode.Path)
-                    WritePath(value, indent: Indent);
+                    WritePathToFile(path, kind, Indent);
             }
             else if (ConsoleReportMode == ProgressReportMode.Path)
             {
-                WritePath(value, indent: Indent, verbosity: Verbosity.Diagnostic);
+                WritePath(path, kind, Indent);
             }
             else if (FileReportMode == ProgressReportMode.Path)
             {
-                WritePath(value, indent: Indent);
+                WritePathToFile(path, kind, Indent);
             }
         }
 
-        private void WritePath(in FileSystemFinderProgress value, string indent)
+        private void WritePathToFile(string path, ProgressKind kind, string indent = null)
         {
-            Out.WritePath(
-                value.Path,
-                BaseDirectoryPath,
-                relativePath: Options.DisplayRelativePath,
-                indent: indent,
-                verbosity: Verbosity.Diagnostic);
-
-            Out.WriteLine(Verbosity.Diagnostic);
+            if (Out.ShouldWrite(Verbosity.Diagnostic))
+            {
+                Out.Write(indent);
+                Out.Write(GetPrefix(kind));
+                Out.WriteLine(GetPath(path));
+            }
         }
 
-        private void WritePath(in FileSystemFinderProgress value, string indent = null, Verbosity verbosity = Verbosity.Quiet)
+        private void WritePath(string path, ProgressKind kind, string indent = null)
         {
-            LogHelpers.WritePath(
-                value.Path,
-                BaseDirectoryPath,
-                relativePath: Options.DisplayRelativePath,
-                colors: Colors.Path_Progress,
-                indent: indent,
-                verbosity: verbosity);
+            ReadOnlySpan<char> p = default;
 
-            WriteLine(verbosity);
+            if (ConsoleOut.ShouldWrite(Verbosity.Diagnostic))
+            {
+                p = GetPath(path);
+
+                ConsoleOut.Write(indent, Colors.Path_Progress);
+                ConsoleOut.Write(GetPrefix(kind), Colors.Path_Progress);
+                ConsoleOut.WriteLine(p, Colors.Path_Progress);
+            }
+
+            if (Out?.ShouldWrite(Verbosity.Diagnostic) == true)
+            {
+                Out.Write(indent);
+                Out.Write(GetPrefix(kind));
+                Out.WriteLine((p.IsEmpty) ? GetPath(path) : p);
+            }
+        }
+
+        private ReadOnlySpan<char> GetPath(string path)
+        {
+            return GetPath(path, BaseDirectoryPath, Options.DisplayRelativePath);
+        }
+
+        private static ReadOnlySpan<char> GetPath(
+            string path,
+            string basePath,
+            bool relativePath)
+        {
+            if (string.Equals(path, basePath, FileSystemHelpers.Comparison))
+                return (relativePath) ? "." : path;
+
+            if (relativePath
+                && basePath != null
+                && path.Length > basePath.Length
+                && path.StartsWith(basePath, FileSystemHelpers.Comparison))
+            {
+                int startIndex = basePath.Length;
+
+                if (FileSystemHelpers.IsDirectorySeparator(path[startIndex]))
+                    startIndex++;
+
+                return path.AsSpan(startIndex);
+            }
+
+            return path;
+        }
+
+        private static string GetPrefix(ProgressKind kind)
+        {
+            return kind switch
+            {
+                ProgressKind.SearchedDirectory => "[SRC] ",
+                ProgressKind.Directory => "[DIR] ",
+                ProgressKind.File => "[FIL] ",
+                _ => throw new InvalidOperationException($"Unknown enum value '{kind}'."),
+            };
         }
     }
 }

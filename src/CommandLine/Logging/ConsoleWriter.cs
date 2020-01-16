@@ -114,15 +114,41 @@ namespace Orang
             }
         }
 
+        public void WriteLine(ReadOnlySpan<char> buffer, in ConsoleColors colors)
+        {
+            if (!colors.IsDefault)
+            {
+                ConsoleColors tmp = Colors;
+                Colors = colors;
+                WriteLine(buffer);
+                Colors = tmp;
+            }
+            else
+            {
+                WriteLine(buffer);
+            }
+        }
+
         public void WriteLine(string value, in ConsoleColors colors, Verbosity verbosity)
         {
             WriteLineIf(verbosity <= Verbosity, value, colors);
+        }
+
+        public void WriteLine(ReadOnlySpan<char> buffer, in ConsoleColors colors, Verbosity verbosity)
+        {
+            WriteLineIf(verbosity <= Verbosity, buffer, colors);
         }
 
         public void WriteLineIf(bool condition, string value, in ConsoleColors colors)
         {
             if (condition)
                 WriteLine(value, colors);
+        }
+
+        public void WriteLineIf(bool condition, ReadOnlySpan<char> buffer, in ConsoleColors colors)
+        {
+            if (condition)
+                WriteLine(buffer, colors);
         }
 
         protected override void Dispose(bool disposing)
