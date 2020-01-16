@@ -380,12 +380,30 @@ namespace Orang.CommandLine
             OptionValues.ConflictResolution_Skip
         );
 
+        public static OptionValueProvider ConflictResolutionProvider_Sync { get; } = new OptionValueProvider(OptionValueProviderNames.ConflictResolution_Sync,
+            OptionValues.ConflictResolution_Ask,
+            OptionValues.ConflictResolution_Overwrite,
+            OptionValues.ConflictResolution_Skip
+        );
+
         public static OptionValueProvider FileCompareOptionsProvider { get; } = new OptionValueProvider(MetaValues.CompareOptions,
             SimpleOptionValue.Create(FileCompareOptions.None, description: "Compare files only by name."),
             SimpleOptionValue.Create(FileCompareOptions.Attributes, description: "Compare file attributes."),
             SimpleOptionValue.Create(FileCompareOptions.Content, description: "Compare file content."),
             SimpleOptionValue.Create(FileCompareOptions.ModifiedTime, shortValue: "mt", helpValue: "m[odified-]t[ime]", description: "Compare time a file was last modified."),
             SimpleOptionValue.Create(FileCompareOptions.Size, description: "Compare file size.")
+        );
+
+        public static OptionValueProvider SyncModeProvider { get; } = new OptionValueProvider(MetaValues.SyncMode,
+            SimpleOptionValue.Create(SyncMode.Synchronize, description: "Compares the two folders and makes sure they have exactly the same content."),
+            SimpleOptionValue.Create(SyncMode.Echo, description: "Looks for changes in the left folder and makes the right folder match the left folder."),
+            SimpleOptionValue.Create(SyncMode.Contribute, description: "Similar to 'echo' mode, but it does not delete any files.")
+        );
+
+        public static OptionValueProvider SyncConflictResolutionProvider { get; } = new OptionValueProvider(MetaValues.SyncConflictResolution,
+            SimpleOptionValue.Create(SyncConflictResolution.Ask, description: ""),
+            SimpleOptionValue.Create(SyncConflictResolution.SourceWins, description: ""),
+            SimpleOptionValue.Create(SyncConflictResolution.TargetWins, description: "")
         );
 
         public static ImmutableDictionary<string, OptionValueProvider> ProvidersByName

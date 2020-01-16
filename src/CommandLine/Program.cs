@@ -73,7 +73,8 @@ namespace Orang.CommandLine
                     MoveCommandLineOptions,
                     RenameCommandLineOptions,
                     ReplaceCommandLineOptions,
-                    SplitCommandLineOptions
+                    SplitCommandLineOptions,
+                    SyncCommandLineOptions
                     >(args);
 
                 bool help = false;
@@ -149,6 +150,7 @@ namespace Orang.CommandLine
                 return parserResult.MapResult(
                     (CopyCommandLineOptions options) => Copy(options),
                     (MoveCommandLineOptions options) => Move(options),
+                    (SyncCommandLineOptions options) => Sync(options),
                     (DeleteCommandLineOptions options) => Delete(options),
                     (EscapeCommandLineOptions options) => Escape(options),
                     (FindCommandLineOptions options) => Find(options),
@@ -261,6 +263,22 @@ namespace Orang.CommandLine
                 return 1;
 
             return Execute(new MoveCommand(options));
+        }
+
+        private static int Sync(SyncCommandLineOptions commandLineOptions)
+        {
+            var options = new SyncCommandOptions();
+
+            if (!commandLineOptions.TryParse(options))
+                return 1;
+
+            return options.SyncMode switch
+            {
+                SyncMode.Synchronize => Execute(new SyncCommand_Synchronize(options)),
+                SyncMode.Echo => Execute(new SyncCommand_Echo(options)),
+                SyncMode.Contribute => Execute(new SyncCommand_Contribute(options)),
+                _ => throw new InvalidOperationException(),
+            };
         }
 
         private static int Rename(RenameCommandLineOptions commandLineOptions)

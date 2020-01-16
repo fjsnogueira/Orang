@@ -184,6 +184,16 @@ namespace Orang.FileSystem
             }
         }
 
+        public static IEnumerable<string> EnumerateAllFiles(string directoryPath, string searchPattern = null)
+        {
+            return Directory.EnumerateFiles(directoryPath, searchPattern ?? "*", _enumerationOptionsRecurse);
+        }
+
+        public static IEnumerable<string> EnumerateAllDirectories(string directoryPath, string searchPattern = null)
+        {
+            return Directory.EnumerateDirectories(directoryPath, searchPattern ?? "*", _enumerationOptionsRecurse);
+        }
+
         internal static bool TryReadAllText(string path, out string content)
         {
             try
