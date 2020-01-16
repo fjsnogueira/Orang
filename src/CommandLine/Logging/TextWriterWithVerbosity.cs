@@ -45,18 +45,25 @@ namespace Orang
 
         public void Write(string value, Verbosity verbosity)
         {
-            WriteIf(verbosity <= Verbosity, value);
+            if (verbosity <= Verbosity)
+                Write(value);
+        }
+
+        public void Write(ReadOnlySpan<char> buffer, Verbosity verbosity)
+        {
+            if (verbosity <= Verbosity)
+                Write(buffer);
         }
 
         public void Write(string value, int startIndex, int length)
         {
-            Writer.Write(value.AsSpan(startIndex, length));
+            Write(value.AsSpan(startIndex, length));
         }
 
         public void Write(string value, int startIndex, int length, Verbosity verbosity)
         {
             if (verbosity <= Verbosity)
-                Write(value, startIndex, length);
+                Write(value.AsSpan(startIndex, length));
         }
 
         public void WriteIf(bool condition, string value)
@@ -65,25 +72,40 @@ namespace Orang
                 Write(value);
         }
 
+        public void WriteIf(bool condition, ReadOnlySpan<char> buffer)
+        {
+            if (condition)
+                Write(buffer);
+        }
+
         public void WriteIf(bool condition, string value, Verbosity verbosity)
         {
             if (condition && verbosity <= Verbosity)
                 Write(value);
         }
 
+        public void WriteIf(bool condition, ReadOnlySpan<char> buffer, Verbosity verbosity)
+        {
+            if (condition && verbosity <= Verbosity)
+                Write(buffer);
+        }
+
         public void WriteLine(Verbosity verbosity)
         {
-            WriteLineIf(verbosity <= Verbosity);
+            if (verbosity <= Verbosity)
+                WriteLine();
         }
 
         public void WriteLine(string value, Verbosity verbosity)
         {
-            WriteLineIf(verbosity <= Verbosity, value);
+            if (verbosity <= Verbosity)
+                WriteLine(value);
         }
 
         public void WriteLine(ReadOnlySpan<char> buffer, Verbosity verbosity)
         {
-            WriteLineIf(verbosity <= Verbosity, buffer);
+            if (verbosity <= Verbosity)
+                WriteLine(buffer);
         }
 
         public void WriteLineIf(bool condition)
@@ -94,7 +116,8 @@ namespace Orang
 
         public void WriteLineIf(bool condition, Verbosity verbosity)
         {
-            WriteLineIf(condition && verbosity <= Verbosity);
+            if (condition && verbosity <= Verbosity)
+                WriteLine();
         }
 
         public void WriteLineIf(bool condition, string value)
@@ -164,29 +187,30 @@ namespace Orang
             Writer.Write(value);
         }
 
-        public override void Write(string format, object arg0)
+        public override void Write(ReadOnlySpan<char> buffer)
         {
-            Debug.Fail("");
-            Writer.Write(format, arg0);
+            Writer.Write(buffer);
         }
 
-        public override void Write(string format, object arg0, object arg1)
-        {
-            Debug.Fail("");
-            Writer.Write(format, arg0, arg1);
-        }
+        //public override void Write(string format, object arg0)
+        //{
+        //    Writer.Write(format, arg0);
+        //}
 
-        public override void Write(string format, object arg0, object arg1, object arg2)
-        {
-            Debug.Fail("");
-            Writer.Write(format, arg0, arg1, arg2);
-        }
+        //public override void Write(string format, object arg0, object arg1)
+        //{
+        //    Writer.Write(format, arg0, arg1);
+        //}
 
-        public override void Write(string format, params object[] arg)
-        {
-            Debug.Fail("");
-            Writer.Write(format, arg);
-        }
+        //public override void Write(string format, object arg0, object arg1, object arg2)
+        //{
+        //    Writer.Write(format, arg0, arg1, arg2);
+        //}
+
+        //public override void Write(string format, params object[] arg)
+        //{
+        //    Writer.Write(format, arg);
+        //}
 
         public override void Write(uint value)
         {
@@ -263,29 +287,25 @@ namespace Orang
             Writer.WriteLine(buffer);
         }
 
-        public override void WriteLine(string format, object arg0)
-        {
-            Debug.Fail("");
-            Writer.WriteLine(format, arg0);
-        }
+        //public override void WriteLine(string format, object arg0)
+        //{
+        //    Writer.WriteLine(format, arg0);
+        //}
 
-        public override void WriteLine(string format, object arg0, object arg1)
-        {
-            Debug.Fail("");
-            Writer.WriteLine(format, arg0, arg1);
-        }
+        //public override void WriteLine(string format, object arg0, object arg1)
+        //{
+        //    Writer.WriteLine(format, arg0, arg1);
+        //}
 
-        public override void WriteLine(string format, object arg0, object arg1, object arg2)
-        {
-            Debug.Fail("");
-            Writer.WriteLine(format, arg0, arg1, arg2);
-        }
+        //public override void WriteLine(string format, object arg0, object arg1, object arg2)
+        //{
+        //    Writer.WriteLine(format, arg0, arg1, arg2);
+        //}
 
-        public override void WriteLine(string format, params object[] arg)
-        {
-            Debug.Fail("");
-            Writer.WriteLine(format, arg);
-        }
+        //public override void WriteLine(string format, params object[] arg)
+        //{
+        //    Writer.WriteLine(format, arg);
+        //}
 
         public override void WriteLine(uint value)
         {
