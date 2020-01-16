@@ -2,12 +2,10 @@
 
 namespace Orang.CommandLine
 {
-    internal interface IResultStorage
+    internal sealed class MoveCommandOptions : CommonCopyCommandOptions
     {
-        void Add(string value);
-
-        void Add(string value, int start, int length);
-
-        int Count { get; }
+        internal MoveCommandOptions()
+        {
+        }
     }
 }

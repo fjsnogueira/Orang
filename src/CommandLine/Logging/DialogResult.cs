@@ -2,12 +2,13 @@
 
 namespace Orang.CommandLine
 {
-    internal interface IResultStorage
+    internal enum DialogResult
     {
-        void Add(string value);
-
-        void Add(string value, int start, int length);
-
-        int Count { get; }
+        None = 0,
+        Yes = 1,
+        YesToAll = 2,
+        No = 3,
+        NoToAll = 4,
+        Cancel = 5
     }
 }
