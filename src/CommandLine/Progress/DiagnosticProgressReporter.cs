@@ -32,43 +32,45 @@ namespace Orang.FileSystem
         {
             if (value.Error != null)
             {
+                Write("[E] ", Colors.Path_Progress);
                 WriteWarning(value.Error, verbosity: Verbosity.Diagnostic);
-                return;
             }
-
-            switch (value.Kind)
+            else
             {
-                case ProgressKind.SearchedDirectory:
-                    {
-                        SearchedDirectoryCount++;
-
-                        if (ConsoleReportMode == ProgressReportMode.Path)
+                switch (value.Kind)
+                {
+                    case ProgressKind.SearchedDirectory:
                         {
-                            WritePath(value.Path, value.Kind, Indent);
-                        }
-                        else if (FileReportMode == ProgressReportMode.Path)
-                        {
-                            WritePathToFile(value.Path, value.Kind);
-                        }
+                            SearchedDirectoryCount++;
 
-                        break;
-                    }
-                case ProgressKind.Directory:
-                    {
-                        DirectoryCount++;
-                        WritePath(value.Path, value.Kind);
-                        break;
-                    }
-                case ProgressKind.File:
-                    {
-                        FileCount++;
-                        WritePath(value.Path, value.Kind);
-                        break;
-                    }
-                default:
-                    {
-                        throw new InvalidOperationException($"Unknown enum value '{value.Kind}'.");
-                    }
+                            if (ConsoleReportMode == ProgressReportMode.Path)
+                            {
+                                WritePath(value.Path, value.Kind, Indent);
+                            }
+                            else if (FileReportMode == ProgressReportMode.Path)
+                            {
+                                WritePathToFile(value.Path, value.Kind);
+                            }
+
+                            break;
+                        }
+                    case ProgressKind.Directory:
+                        {
+                            DirectoryCount++;
+                            WritePath(value.Path, value.Kind);
+                            break;
+                        }
+                    case ProgressKind.File:
+                        {
+                            FileCount++;
+                            WritePath(value.Path, value.Kind);
+                            break;
+                        }
+                    default:
+                        {
+                            throw new InvalidOperationException($"Unknown enum value '{value.Kind}'.");
+                        }
+                }
             }
         }
 
@@ -147,9 +149,9 @@ namespace Orang.FileSystem
         {
             return kind switch
             {
-                ProgressKind.SearchedDirectory => "[SCAN] ",
-                ProgressKind.Directory => "[DIR]  ",
-                ProgressKind.File => "[FILE] ",
+                ProgressKind.SearchedDirectory => "[S] ",
+                ProgressKind.Directory => "[D] ",
+                ProgressKind.File => "[F] ",
                 _ => throw new InvalidOperationException($"Unknown enum value '{kind}'."),
             };
         }
