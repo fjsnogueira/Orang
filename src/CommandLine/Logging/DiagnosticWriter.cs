@@ -322,8 +322,6 @@ namespace Orang.CommandLine
             WriteIndent();
             WriteOption("file properties", format.FileProperties);
             WriteIndent();
-            WriteOption("include base directory", format.IncludeBaseDirectory);
-            WriteIndent();
             WriteOption("indent", format.Indent, replaceAllSymbols: true);
             WriteIndent();
             WriteOption("line options", format.LineOptions);

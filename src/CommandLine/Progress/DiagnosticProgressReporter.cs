@@ -6,9 +6,9 @@ using static Orang.Logger;
 
 namespace Orang.FileSystem
 {
-    internal class FileSystemFinderProgressReporter : IProgress<FileSystemFinderProgress>
+    internal class DiagnosticProgressReporter : ProgressReporter
     {
-        public FileSystemFinderProgressReporter(
+        public DiagnosticProgressReporter(
             ProgressReportMode consoleReportMode,
             ProgressReportMode fileReportMode,
             CommonFindCommandOptions options,
@@ -20,8 +20,6 @@ namespace Orang.FileSystem
             Indent = indent;
         }
 
-        public string BaseDirectoryPath { get; set; }
-
         public ProgressReportMode ConsoleReportMode { get; }
 
         public ProgressReportMode FileReportMode { get; }
@@ -30,15 +28,7 @@ namespace Orang.FileSystem
 
         public string Indent { get; }
 
-        public int SearchedDirectoryCount { get; private set; }
-
-        public int DirectoryCount { get; private set; }
-
-        public int FileCount { get; private set; }
-
-        public bool ProgressReported { get; set; }
-
-        public void Report(FileSystemFinderProgress value)
+        public override void Report(FileSystemFinderProgress value)
         {
             if (value.Error != null)
             {
@@ -169,9 +159,9 @@ namespace Orang.FileSystem
         {
             return kind switch
             {
-                ProgressKind.SearchedDirectory => "[SRC] ",
-                ProgressKind.Directory => "[DIR] ",
-                ProgressKind.File => "[FIL] ",
+                ProgressKind.SearchedDirectory => "[SCAN] ",
+                ProgressKind.Directory => "[DIR]  ",
+                ProgressKind.File => "[FILE] ",
                 _ => throw new InvalidOperationException($"Unknown enum value '{kind}'."),
             };
         }
