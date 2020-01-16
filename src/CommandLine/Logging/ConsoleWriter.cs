@@ -102,8 +102,8 @@ namespace Orang
 
         public void WriteIf(bool condition, string value, in ConsoleColors colors, Verbosity verbosity)
         {
-            if (condition)
-                Write(value, colors, verbosity);
+            if (condition && verbosity <= Verbosity)
+                Write(value, colors);
         }
 
         public void WriteLine(string value, in ConsoleColors colors)

@@ -192,25 +192,30 @@ namespace Orang
             Writer.Write(buffer);
         }
 
-        //public override void Write(string format, object arg0)
-        //{
-        //    Writer.Write(format, arg0);
-        //}
+        public override void Write(string format, object arg0)
+        {
+            Debug.Fail("");
+            Writer.Write(format, arg0);
+        }
 
-        //public override void Write(string format, object arg0, object arg1)
-        //{
-        //    Writer.Write(format, arg0, arg1);
-        //}
+        public override void Write(string format, object arg0, object arg1)
+        {
+            Debug.Fail("");
+            Writer.Write(format, arg0, arg1);
+        }
 
-        //public override void Write(string format, object arg0, object arg1, object arg2)
-        //{
-        //    Writer.Write(format, arg0, arg1, arg2);
-        //}
+        public override void Write(string format, object arg0, object arg1, object arg2)
+        {
+            Debug.Fail("");
+            Writer.Write(format, arg0, arg1, arg2);
+        }
 
-        //public override void Write(string format, params object[] arg)
-        //{
-        //    Writer.Write(format, arg);
-        //}
+        public override void Write(string format, params object[] arg)
+        {
+            Debug.Fail("");
+            Debug.Fail("");
+            Writer.Write(format, arg);
+        }
 
         public override void Write(uint value)
         {
@@ -287,25 +292,29 @@ namespace Orang
             Writer.WriteLine(buffer);
         }
 
-        //public override void WriteLine(string format, object arg0)
-        //{
-        //    Writer.WriteLine(format, arg0);
-        //}
+        public override void WriteLine(string format, object arg0)
+        {
+            Debug.Fail("");
+            Writer.WriteLine(format, arg0);
+        }
 
-        //public override void WriteLine(string format, object arg0, object arg1)
-        //{
-        //    Writer.WriteLine(format, arg0, arg1);
-        //}
+        public override void WriteLine(string format, object arg0, object arg1)
+        {
+            Debug.Fail("");
+            Writer.WriteLine(format, arg0, arg1);
+        }
 
-        //public override void WriteLine(string format, object arg0, object arg1, object arg2)
-        //{
-        //    Writer.WriteLine(format, arg0, arg1, arg2);
-        //}
+        public override void WriteLine(string format, object arg0, object arg1, object arg2)
+        {
+            Debug.Fail("");
+            Writer.WriteLine(format, arg0, arg1, arg2);
+        }
 
-        //public override void WriteLine(string format, params object[] arg)
-        //{
-        //    Writer.WriteLine(format, arg);
-        //}
+        public override void WriteLine(string format, params object[] arg)
+        {
+            Debug.Fail("");
+            Writer.WriteLine(format, arg);
+        }
 
         public override void WriteLine(uint value)
         {
