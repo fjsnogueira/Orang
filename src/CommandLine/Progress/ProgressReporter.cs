@@ -6,7 +6,7 @@ namespace Orang.FileSystem
 {
     internal class ProgressReporter : IProgress<FileSystemFinderProgress>
     {
-        public string BaseDirectoryPath { get; set; }
+        public string BaseDirectoryPath { get; private set; }
 
         public int SearchedDirectoryCount { get; protected set; }
 

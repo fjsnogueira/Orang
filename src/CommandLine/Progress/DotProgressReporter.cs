@@ -38,7 +38,7 @@ namespace Orang.FileSystem
             }
         }
 
-        private void WriteProgress()
+        protected void WriteProgress()
         {
             if ((FileCount + DirectoryCount) % 100 == 0)
             {

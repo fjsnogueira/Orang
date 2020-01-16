@@ -6,7 +6,7 @@ using static Orang.Logger;
 
 namespace Orang.FileSystem
 {
-    internal class DiagnosticProgressReporter : ProgressReporter
+    internal class DiagnosticProgressReporter : DotProgressReporter
     {
         public DiagnosticProgressReporter(
             ProgressReportMode consoleReportMode,
@@ -76,11 +76,7 @@ namespace Orang.FileSystem
         {
             if (ConsoleReportMode == ProgressReportMode.Dot)
             {
-                if ((FileCount + DirectoryCount) % 100 == 0)
-                {
-                    ConsoleOut.Write(".", Colors.Path_Progress);
-                    ProgressReported = true;
-                }
+                WriteProgress();
 
                 if (FileReportMode == ProgressReportMode.Path)
                     WritePathToFile(path, kind, Indent);
@@ -97,32 +93,24 @@ namespace Orang.FileSystem
 
         private void WritePathToFile(string path, ProgressKind kind, string indent = null)
         {
-            if (Out.ShouldWrite(Verbosity.Diagnostic))
-            {
-                Out.Write(indent);
-                Out.Write(GetPrefix(kind));
-                Out.WriteLine(GetPath(path));
-            }
+            Out.Write(indent);
+            Out.Write(GetPrefix(kind));
+            Out.WriteLine(GetPath(path));
         }
 
         private void WritePath(string path, ProgressKind kind, string indent = null)
         {
-            ReadOnlySpan<char> p = default;
+            ReadOnlySpan<char> pathDisplay = GetPath(path);
 
-            if (ConsoleOut.ShouldWrite(Verbosity.Diagnostic))
-            {
-                p = GetPath(path);
+            ConsoleOut.Write(indent, Colors.Path_Progress);
+            ConsoleOut.Write(GetPrefix(kind), Colors.Path_Progress);
+            ConsoleOut.WriteLine(pathDisplay, Colors.Path_Progress);
 
-                ConsoleOut.Write(indent, Colors.Path_Progress);
-                ConsoleOut.Write(GetPrefix(kind), Colors.Path_Progress);
-                ConsoleOut.WriteLine(p, Colors.Path_Progress);
-            }
-
-            if (Out?.ShouldWrite(Verbosity.Diagnostic) == true)
+            if (FileReportMode == ProgressReportMode.Path)
             {
                 Out.Write(indent);
                 Out.Write(GetPrefix(kind));
-                Out.WriteLine((p.IsEmpty) ? GetPath(path) : p);
+                Out.WriteLine(pathDisplay);
             }
         }
 
