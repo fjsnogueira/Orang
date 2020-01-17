@@ -715,35 +715,41 @@ namespace Orang.CommandLine
             {
                 using (IEnumerator<string> en = values.GetEnumerator())
                 {
-                    if (en.MoveNext())
+                    if (!en.MoveNext())
+                        return "";
+
+                    string value = en.Current;
+
+                    if (!en.MoveNext())
+                        return (literal) ? RegexEscape.Escape(value) : value;
+
+                    StringBuilder sb = StringBuilderCache.GetInstance();
+
+                    AppendValue(value, sb);
+
+                    do
                     {
-                        StringBuilder sb = StringBuilderCache.GetInstance();
+                        sb.Append("|");
+                        AppendValue(en.Current, sb);
 
-                        sb.Append((literal) ? "(?n:" : "(?:");
+                    } while (en.MoveNext());
 
-                        while (true)
-                        {
-                            sb.Append((literal) ? "(" : "(?:");
-                            sb.Append((literal) ? RegexEscape.Escape(en.Current) : en.Current);
-                            sb.Append(")");
-
-                            if (en.MoveNext())
-                            {
-                                sb.Append("|");
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-
-                        sb.Append(")");
-
-                        return StringBuilderCache.GetStringAndFree(sb);
-                    }
+                    return StringBuilderCache.GetStringAndFree(sb);
                 }
+            }
 
-                return "";
+            void AppendValue(string value, StringBuilder sb)
+            {
+                if (literal)
+                {
+                    sb.Append(RegexEscape.Escape(value));
+                }
+                else
+                {
+                    sb.Append("(?:");
+                    sb.Append(value);
+                    sb.Append(")");
+                }
             }
         }
 
