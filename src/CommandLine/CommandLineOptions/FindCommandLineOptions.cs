@@ -12,7 +12,7 @@ namespace Orang.CommandLine
     [Verb("find", HelpText = "Searches the file system for files and directories and optionally searches files' content.")]
     [OptionValueProvider(nameof(Content), OptionValueProviderNames.PatternOptionsWithoutPart)]
     [OptionValueProvider(nameof(Highlight), OptionValueProviderNames.FindHighlightOptions)]
-    internal sealed class FindCommandLineOptions : CommonFindCommandLineOptions
+    internal class FindCommandLineOptions : CommonFindCommandLineOptions
     {
         [Option(longName: OptionNames.Ask,
             HelpText = "Ask for permission after each file or value.",
@@ -28,6 +28,11 @@ namespace Orang.CommandLine
             HelpText = "Stop searching after specified number is reached.",
             MetaValue = MetaValues.MaxOptions)]
         public IEnumerable<string> MaxCount { get; set; }
+
+        [Option(longName: OptionNames.Modify,
+            HelpText = "Functions to modify results.",
+            MetaValue = MetaValues.ModifyOptions)]
+        public IEnumerable<string> Modify { get; set; }
 
         [Option(shortName: OptionShortNames.Name, longName: OptionNames.Name,
             HelpText = "Regular expression for file or directory name. Syntax is <PATTERN> [<PATTERN_OPTIONS>].",
@@ -49,13 +54,8 @@ namespace Orang.CommandLine
             if (!TryParseAsEnumFlags(Highlight, OptionNames.Highlight, out HighlightOptions highlightOptions, defaultValue: HighlightOptions.Default, provider: OptionValueProviders.FindHighlightOptionsProvider))
                 return false;
 
-            Filter contentFilter = null;
-
-            if (Content.Any()
-                && !TryParseFilter(Content, OptionNames.Content, out contentFilter, provider: OptionValueProviders.PatternOptionsWithoutPartProvider))
-            {
+            if (!FilterParser.TryParse(Content, OptionNames.Content, OptionValueProviders.PatternOptionsWithoutPartProvider, out Filter contentFilter, allowNull: true))
                 return false;
-            }
 
             if (!TryParseDisplay(
                 values: Display,
@@ -103,6 +103,21 @@ namespace Orang.CommandLine
                 maxMatchingFiles = (maxCount > 0) ? maxCount : maxMatchingFiles;
             }
 
+            if (!TryParseModifyOptions(Modify, OptionNames.Modify, out ModifyOptions modifyOptions, out bool aggregateOnly))
+                return false;
+
+            if (modifyOptions.HasAnyFunction
+                && contentDisplayStyle == ContentDisplayStyle.ValueDetail)
+            {
+                contentDisplayStyle = ContentDisplayStyle.Value;
+            }
+
+            if (aggregateOnly)
+            {
+                ConsoleOut.Verbosity = Orang.Verbosity.Minimal;
+                pathDisplayStyle = PathDisplayStyle.Omit;
+            }
+
             options.Format = new OutputDisplayFormat(
                 contentDisplayStyle: contentDisplayStyle ?? ContentDisplayStyle.Line,
                 pathDisplayStyle: pathDisplayStyle ?? PathDisplayStyle.Full,
@@ -112,10 +127,10 @@ namespace Orang.CommandLine
                 indent: indent,
                 separator: separator);
 
+            options.ModifyOptions = modifyOptions;
             options.HighlightOptions = highlightOptions;
             options.SearchTarget = GetSearchTarget();
             options.ContentFilter = contentFilter;
-
             options.MaxMatchesInFile = maxMatchesInFile;
             options.MaxMatches = maxMatches;
             options.MaxMatchingFiles = maxMatchingFiles;
