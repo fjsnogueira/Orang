@@ -121,7 +121,10 @@ namespace Orang.CommandLine
 
         internal static void WriteCommand(ListSyntaxCommandOptions options)
         {
+            WriteOption("char", options.Value);
+            WriteOption("char group", options.InCharGroup);
             WriteOption("filter", options.Filter);
+            WriteOption("regex options", options.RegexOptions);
             WriteOption("sections", options.Sections);
         }
 
@@ -244,6 +247,22 @@ namespace Orang.CommandLine
             else
             {
                 WriteValue(value.Value);
+            }
+
+            WriteLine();
+        }
+
+        private static void WriteOption(string name, char? value)
+        {
+            WriteName(name);
+
+            if (value == null)
+            {
+                WriteNullValue();
+            }
+            else
+            {
+                WriteValue(value.Value.ToString());
             }
 
             WriteLine();
