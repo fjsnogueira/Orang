@@ -72,7 +72,7 @@ namespace Orang.CommandLine
                     WritePathPrefix(sourcePath, "SRC", default, indent);
                     WritePathPrefix(destinationPath, "TRG", default, indent);
 
-                    DialogResult dialogResult = ConsoleHelpers.QuestionWithResult("Prefer target directory?", indent);
+                    DialogResult dialogResult = ConsoleHelpers.Ask("Prefer target directory?", indent);
 
                     switch (dialogResult)
                     {
