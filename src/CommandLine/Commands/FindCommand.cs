@@ -130,17 +130,17 @@ namespace Orang.CommandLine
         {
             context.Telemetry.FileCount++;
 
-            FileSystemFinderResult? maybeResult = MatchFile(filePath, context.Progress);
+            FileSystemFinderResult result = MatchFile(filePath, context.Progress);
 
-            if (maybeResult != null)
+            if (result != null)
             {
                 if (ContentFilter != null)
                 {
-                    ProcessResult(maybeResult.Value, context, FileWriterOptions);
+                    ProcessResult(result, context, FileWriterOptions);
                 }
                 else
                 {
-                    ExecuteOrAddResult(maybeResult.Value, context, null);
+                    ExecuteOrAddResult(result, context, null);
                 }
             }
         }
@@ -164,6 +164,9 @@ namespace Orang.CommandLine
                 if (context.TerminationReason == TerminationReason.MaxReached)
                     break;
             }
+
+            if (ContentFilter == null)
+                _storageIndexes?.Add(_storage.Count);
         }
 
         private void ProcessResult(
@@ -238,18 +241,7 @@ namespace Orang.CommandLine
                 WriteMatches(input, match, writerOptions, context);
             }
 
-            if (_askMode == AskMode.File)
-            {
-                try
-                {
-                    if (ConsoleHelpers.Question("Continue without asking?", indent))
-                        _askMode = AskMode.None;
-                }
-                catch (OperationCanceledException)
-                {
-                    context.TerminationReason = TerminationReason.Canceled;
-                }
-            }
+            AskToContinue(context, indent);
         }
 
         protected override void ExecuteResult(SearchResult result, SearchContext context, ColumnWidths columnWidths)
@@ -276,11 +268,23 @@ namespace Orang.CommandLine
             if (!Options.OmitPath)
                 WritePath(context, result, baseDirectoryPath, indent, columnWidths);
 
+            if (_storage != null
+                && result.Match != null
+                && !object.ReferenceEquals(result.Match, Match.Empty))
+            {
+                _storage.Add(result.Match.Value);
+            }
+
+            AskToContinue(context, indent);
+        }
+
+        protected void AskToContinue(SearchContext context, string indent)
+        {
             if (_askMode == AskMode.File)
             {
                 try
                 {
-                    if (ConsoleHelpers.Question("Continue without asking?", indent))
+                    if (ConsoleHelpers.AskToContinue(indent))
                         _askMode = AskMode.None;
                 }
                 catch (OperationCanceledException)
@@ -639,7 +643,7 @@ namespace Orang.CommandLine
                 if ((modifyOptions.Functions & ModifyFunctions.Except) != 0)
                 {
                     if (_storageIndexes.Count > 2)
-                        throw new InvalidOperationException("'Except' operation cannot be applied on more than two files.");
+                        throw new InvalidOperationException($"'Except' operation cannot be applied on more than two {((ContentFilter != null) ? "files" : "directories")}.");
 
                     int index = _storageIndexes[0];
 

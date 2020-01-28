@@ -98,10 +98,10 @@ namespace Orang.CommandLine
         {
             context.Telemetry.FileCount++;
 
-            FileSystemFinderResult? maybeResult = MatchFile(filePath, context.Progress);
+            FileSystemFinderResult result = MatchFile(filePath, context.Progress);
 
-            if (maybeResult != null)
-                ProcessResult(maybeResult.Value, context, FileWriterOptions);
+            if (result != null)
+                ProcessResult(result, context, FileWriterOptions);
         }
 
         protected override void ExecuteDirectory(string directoryPath, SearchContext context)
@@ -288,10 +288,10 @@ namespace Orang.CommandLine
                         {
                             if (Options.DryRun)
                             {
-                                if (ConsoleHelpers.Question("Continue without asking?", indent))
+                                if (ConsoleHelpers.AskToContinue(indent))
                                     Options.AskMode = AskMode.None;
                             }
-                            else if (ConsoleHelpers.Question("Replace content?", indent))
+                            else if (ConsoleHelpers.AskToExecute("Replace content?", indent))
                             {
                                 File.WriteAllText(filePath, textWriter!.ToString(), encoding);
                             }
