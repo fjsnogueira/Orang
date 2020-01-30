@@ -2,16 +2,14 @@
 
 namespace Orang.CommandLine
 {
-    internal sealed class ReplaceCommandOptions : CommonFindCommandOptions
+    internal abstract class DeleteOrRenameCommandOptions : FileSystemCommandOptions
     {
-        internal ReplaceCommandOptions()
+        protected DeleteOrRenameCommandOptions()
         {
         }
 
-        public string Input { get; internal set; }
+        public bool Ask { get; internal set; }
 
         public bool DryRun { get; internal set; }
-
-        public ReplaceOptions ReplaceOptions { get; internal set; }
     }
 }
