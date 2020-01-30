@@ -11,7 +11,7 @@ using static Orang.Logger;
 
 namespace Orang.CommandLine
 {
-    internal abstract class CommonCopyCommand<TOptions> : FindCommand<TOptions> where TOptions : CommonCopyCommandOptions
+    internal abstract class CommonCopyCommand<TOptions> : CommonFindCommand<TOptions> where TOptions : CommonCopyCommandOptions
     {
         protected CommonCopyCommand(TOptions options) : base(options)
         {
@@ -56,16 +56,15 @@ namespace Orang.CommandLine
             string baseDirectoryPath = null,
             ColumnWidths columnWidths = null)
         {
-            base.ExecuteResult(result, context, writerOptions, match, input, encoding, baseDirectoryPath, columnWidths);
-
-            ExecuteOperation(result, context, baseDirectoryPath, GetPathIndent(baseDirectoryPath));
+            ExecuteResult(result, context, baseDirectoryPath, columnWidths);
         }
 
-        protected override void ExecuteResult(FileSystemFinderResult result, SearchContext context, string baseDirectoryPath = null, ColumnWidths columnWidths = null)
+        protected sealed override void ExecuteResult(FileSystemFinderResult result, SearchContext context, string baseDirectoryPath = null, ColumnWidths columnWidths = null)
         {
-            base.ExecuteResult(result, context, baseDirectoryPath, columnWidths);
-
             ExecuteOperation(result, context, baseDirectoryPath, GetPathIndent(baseDirectoryPath));
+
+            if (context.TerminationReason != TerminationReason.Canceled)
+                AskToContinue(context, GetPathIndent(baseDirectoryPath));
         }
 
         private void ExecuteOperation(
@@ -174,7 +173,7 @@ namespace Orang.CommandLine
                     question = "Overwrite file?";
                 }
 
-                DialogResult dialogResult = ConsoleHelpers.QuestionWithResult(question, indent);
+                DialogResult dialogResult = ConsoleHelpers.Ask(question, indent);
                 switch (dialogResult)
                 {
                     case DialogResult.Yes:

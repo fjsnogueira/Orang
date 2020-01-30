@@ -14,7 +14,7 @@ using static Orang.Logger;
 
 namespace Orang.CommandLine
 {
-    internal class ReplaceCommand : FindCommand<ReplaceCommandOptions>
+    internal class ReplaceCommand : CommonFindCommand<ReplaceCommandOptions>
     {
         private OutputSymbols _symbols;
 
@@ -98,10 +98,10 @@ namespace Orang.CommandLine
         {
             context.Telemetry.FileCount++;
 
-            FileSystemFinderResult? maybeResult = MatchFile(filePath, context.Progress);
+            FileSystemFinderResult result = MatchFile(filePath, context.Progress);
 
-            if (maybeResult != null)
-                ProcessResult(maybeResult.Value, context, FileWriterOptions);
+            if (result != null)
+                ProcessResult(result, context, FileWriterOptions);
         }
 
         protected override void ExecuteDirectory(string directoryPath, SearchContext context)
@@ -139,6 +139,16 @@ namespace Orang.CommandLine
                 return;
 
             ExecuteOrAddResult(result, context, writerOptions, match, input, encoding, baseDirectoryPath);
+        }
+
+        protected override void ExecuteResult(FileSystemFinderResult result, SearchContext context, string baseDirectoryPath = null, ColumnWidths columnWidths = null)
+        {
+            string indent = GetPathIndent(baseDirectoryPath);
+
+            if (!Options.OmitPath)
+                WritePath(context, result, baseDirectoryPath, indent, columnWidths);
+
+            AskToContinue(context, indent);
         }
 
         protected override void ExecuteResult(
@@ -288,10 +298,10 @@ namespace Orang.CommandLine
                         {
                             if (Options.DryRun)
                             {
-                                if (ConsoleHelpers.Question("Continue without asking?", indent))
+                                if (ConsoleHelpers.AskToContinue(indent))
                                     Options.AskMode = AskMode.None;
                             }
-                            else if (ConsoleHelpers.Question("Replace content?", indent))
+                            else if (ConsoleHelpers.AskToExecute("Replace content?", indent))
                             {
                                 File.WriteAllText(filePath, textWriter!.ToString(), encoding);
                             }
