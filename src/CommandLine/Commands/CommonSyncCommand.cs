@@ -20,8 +20,6 @@ namespace Orang.CommandLine
 
         public bool DryRun => Options.DryRun;
 
-        public sealed override bool CanWriteContent => false;
-
         protected void ExecuteOperations(
             SearchContext context,
             string sourcePath,
